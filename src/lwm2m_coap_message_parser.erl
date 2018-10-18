@@ -35,6 +35,7 @@
 -define(OPTION_PROXY_URI, 35).
 -define(OPTION_PROXY_SCHEME, 39).
 -define(OPTION_SIZE1, 60).
+-define(OPTION_SIZE2, 28).
 
 % empty message only contains the 4-byte header
 decode(<<?VERSION:2, Type:2, 0:4, 0:3, 0:5, MsgId:16>>) ->
@@ -240,6 +241,7 @@ decode_option(?OPTION_LOCATION_QUERY, OptVal) -> {location_query, OptVal};
 decode_option(?OPTION_PROXY_URI, OptVal) -> {proxy_uri, OptVal};
 decode_option(?OPTION_PROXY_SCHEME, OptVal) -> {proxy_scheme, OptVal};
 decode_option(?OPTION_SIZE1, OptVal) -> {size1, binary:decode_unsigned(OptVal)};
+decode_option(?OPTION_SIZE2, OptVal) -> {size2, binary:decode_unsigned(OptVal)};
 % draft-ietf-core-observe-16
 decode_option(?OPTION_OBSERVE, OptVal) -> {observe, binary:decode_unsigned(OptVal)};
 % draft-ietf-core-block-17
@@ -276,6 +278,7 @@ encode_option({location_query, OptVal}) -> {?OPTION_LOCATION_QUERY, OptVal};
 encode_option({proxy_uri, OptVal}) -> {?OPTION_PROXY_URI, OptVal};
 encode_option({proxy_scheme, OptVal}) -> {?OPTION_PROXY_SCHEME, OptVal};
 encode_option({size1, OptVal}) -> {?OPTION_SIZE1, binary:encode_unsigned(OptVal)};
+encode_option({size2, OptVal}) -> {?OPTION_SIZE2, binary:encode_unsigned(OptVal)};
 % draft-ietf-core-observe-16
 encode_option({observe, OptVal}) -> {?OPTION_OBSERVE, binary:encode_unsigned(OptVal)};
 % draft-ietf-core-block-17

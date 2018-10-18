@@ -113,7 +113,7 @@ set_content(#coap_content{payload=Payload} = Content, undefined, Msg) ->
     if
         PayloadSize =< ?MAX_BLOCK_SIZE -> %% segmentation not required
             set_payload(Payload,
-                        set_opts_from_content(Msg, Content, [payload]));
+                set_opts_from_content(Msg, Content, [payload]));
         true -> % payload too large, segmentation required (late negotiation)
             set_content(Content, {0, true, ?MAX_BLOCK_SIZE}, Msg)
     end;
@@ -121,7 +121,7 @@ set_content(#coap_content{payload=Payload} = Content, undefined, Msg) ->
 % segmentation requested (early negotiation)
 set_content(#coap_content{payload=Payload} = Content, Block, Msg) ->
     WithPayload = set_payload_block(Payload, Block, Msg),
-    set_opts_from_content(WithPayload, Content, [payload, block1, block2]).
+    set_opts_from_content(WithPayload, Content, [payload, block1, block2, size1, size2]).
 
 set_opts_from_content(Message, Content, OmitList) ->
     lists:foldl(fun(Key, Msg) ->
@@ -133,19 +133,21 @@ set_opts_from_content(Message, Content, OmitList) ->
     end, Message, record_info(fields, coap_content)).
 
 set_payload_block(Payload, Block, Msg=#coap_message{method=Method}) when is_atom(Method) ->
-    set_payload_block(Payload, block1, Block, Msg);
+    set_payload_block(Payload, block1, size1, Block, Msg);
 set_payload_block(Payload, Block, Msg=#coap_message{}) ->
-    set_payload_block(Payload, block2, Block, Msg).
+    set_payload_block(Payload, block2, size2, Block, Msg).
 
-set_payload_block(Payload, BlockId, _Block={Num, _, Size}, Msg) ->
+set_payload_block(Payload, BlockId, SizeId, _Block={Num, _, Size}, Msg) ->
     PayloadSize = iolist_size(Payload),
     if
         PayloadSize > (Num+1)*Size ->
-            set(BlockId, {Num, true, Size},
-                set_payload(binary:part(Payload, Num*Size, Size), Msg));
+            set(SizeId, PayloadSize,
+                set(BlockId, {Num, true, Size},
+                    set_payload(binary:part(Payload, Num*Size, Size), Msg)));
         (PayloadSize > Num*Size) andalso (PayloadSize =< (Num+1)*Size)->
-            set(BlockId, {Num, false, Size},
-                set_payload(binary:part(Payload, Num*Size, PayloadSize-Num*Size), Msg));
+            set(SizeId, PayloadSize,
+                set(BlockId, {Num, false, Size},
+                    set_payload(binary:part(Payload, Num*Size, PayloadSize-Num*Size), Msg)));
         true ->
             throw({invalid_block_opt, _Block, PayloadSize})
     end.
@@ -165,6 +167,7 @@ content_value(accept, Content) -> Content#coap_content.accept;
 content_value(proxy_uri, Content) -> Content#coap_content.proxy_uri;
 content_value(proxy_scheme, Content) -> Content#coap_content.proxy_scheme;
 content_value(size1, Content) -> Content#coap_content.size1;
+content_value(size2, Content) -> Content#coap_content.size1;
 content_value(observe, Content) -> Content#coap_content.observe;
 content_value(block1, Content) -> Content#coap_content.block1;
 content_value(block2, Content) -> Content#coap_content.block2;
