@@ -145,8 +145,8 @@ handle_info(Info, State) ->
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
-terminate(_Reason, #state{sock=Sock}) ->
-    error_logger:error_msg("coap socket stopped, error: ~p", [_Reason]),
+terminate(Reason, #state{sock=Sock}) ->
+    error_logger:info_msg("coap socket stopped, reason: ~p", [Reason]),
     gen_udp:close(Sock),
     ok.
 
