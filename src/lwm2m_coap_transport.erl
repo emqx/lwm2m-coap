@@ -218,23 +218,37 @@ handle_request(Message, #state{cid=ChId, channel=Channel, receiver={Sender, Ref}
 
 handle_response(Message, #state{cid=ChId, channel=Channel, receiver={Sender, Ref}}) ->
     Sender ! {coap_response, ChId, Channel, Ref, Message},
-    request_complete(Channel, Message).
+    request_complete(Channel, Message, Ref).
 
-handle_error(Message, _Error, #state{channel=Channel}) ->
-    request_complete(Channel, Message).
+handle_error(Message, _Error, #state{channel=Channel, receiver={_Sender, Ref}}) ->
+    request_complete(Channel, Message, Ref).
 
 handle_ack(_Message, #state{cid=ChId, channel=Channel, receiver={Sender, Ref}}) ->
     Sender ! {coap_ack, ChId, Channel, Ref},
     ok.
 
-request_complete(Channel, Msg=#coap_message{options=Options}) ->
+request_complete(Channel, #coap_message{token=Token, options=Options}, Ref) ->
     case proplists:get_value(observe, Options, []) of
         [] ->
-            Channel ! {request_complete, Msg},
-            ok;
+            % Close the channel only when the LwM2M object is not /19,
+            % as some devices (i.e. from huawei) won't contain
+            % the `observe` option while transfering there data using /19
+			case extract_lwm2m_path(Ref) of
+				<<"/19", _/binary>> ->
+					ok;
+				_ ->
+                    Channel ! {request_complete, Token}
+            end;
         _Else ->
             ok
     end.
+
+extract_lwm2m_path(#{<<"data">> := Data}) ->
+  maps:get(<<"path">>, Data, nil);
+extract_lwm2m_path(#{<<"path">> := Path}) ->
+  Path;
+extract_lwm2m_path(_) ->
+  nil.
 
 % start the timer
 next_state(Phase, State=#state{channel=Channel, tid=TrId, timer=undefined}, Timeout) ->
