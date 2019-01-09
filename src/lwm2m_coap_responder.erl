@@ -267,7 +267,7 @@ handle_post(ChId, Request, State=#state{prefix=Prefix, module=Module, lwm2m_stat
     Content = lwm2m_coap_message:get_content(Request),
     case invoke_callback(Module, coap_post, [ChId, Prefix, uri_query(Request), Content], Lwm2mState, Args) of
         {ok, Code, Content2, Lwm2mState2} ->
-            return_resource([], Request, {ok, Code}, Content2, State#state{lwm2m_state=Lwm2mState2});
+            return_resource([], Request#coap_message{type=non}, {ok, Code}, Content2, State#state{lwm2m_state=Lwm2mState2});
         {error, Error, Lwm2mState2} ->
             return_response(Request, {error, Error}, State#state{lwm2m_state=Lwm2mState2});
         {error, Error, Reason, Lwm2mState2} ->

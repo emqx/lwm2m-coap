@@ -37,6 +37,7 @@ ack(Request=#coap_message{}) ->
 response(Request=#coap_message{type=non}) ->
     #coap_message{
         type=non,
+        id=Request#coap_message.id,
         token=Request#coap_message.token
     };
 response(Request=#coap_message{type=con}) ->
