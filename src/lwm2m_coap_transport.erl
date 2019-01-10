@@ -227,28 +227,14 @@ handle_ack(_Message, #state{cid=ChId, channel=Channel, receiver={Sender, Ref}}) 
     Sender ! {coap_ack, ChId, Channel, Ref},
     ok.
 
-request_complete(Channel, #coap_message{token=Token, options=Options}, Ref) ->
+request_complete(Channel, #coap_message{token=Token, options=Options}, _Ref) ->
     case proplists:get_value(observe, Options, []) of
         [] ->
-            % Close the channel only when the LwM2M object is not /19,
-            % as some devices (i.e. from huawei) won't contain
-            % the `observe` option while transfering there data using /19
-			case extract_lwm2m_path(Ref) of
-				<<"/19", _/binary>> ->
-					ok;
-				_ ->
-                    Channel ! {request_complete, Token}
-            end;
+            % Close the channel if it is not in an observation
+            Channel ! {request_complete, Token};
         _Else ->
             ok
     end.
-
-extract_lwm2m_path(#{<<"data">> := Data}) ->
-  maps:get(<<"path">>, Data, nil);
-extract_lwm2m_path(#{<<"path">> := Path}) ->
-  Path;
-extract_lwm2m_path(_) ->
-  nil.
 
 % start the timer
 next_state(Phase, State=#state{channel=Channel, tid=TrId, timer=undefined}, Timeout) ->
