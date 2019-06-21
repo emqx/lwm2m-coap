@@ -21,7 +21,7 @@
     {'error', atom(), lwm2m_state()}.
 
 % POST handler
--callback coap_post(coap_channel_id(), [binary()], [binary()], coap_content(), lwm2m_state(), lwm2m_state()) ->
+-callback coap_post(coap_channel_id(), [binary()], [binary()], coap_content(), lwm2m_state()) ->
     {'ok', atom(), coap_content(), lwm2m_state()} |
     {'error', atom(), lwm2m_state()}.
 
@@ -41,7 +41,7 @@
     {'error', atom(), lwm2m_state()}.
 
 % cancellation request handler
--callback coap_unobserve(any(), lwm2m_state()) ->
+-callback coap_unobserve(lwm2m_state()) ->
     {'ok', lwm2m_state()}.
 
 % handler for messages sent to the responder process
