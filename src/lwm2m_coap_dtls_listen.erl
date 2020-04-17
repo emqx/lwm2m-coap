@@ -37,7 +37,7 @@
 %% @end
 %%--------------------------------------------------------------------
 start_link(SocketSup, InPort, Opts) ->
-    gen_server:start_link({local, ?SERVER}, ?MODULE, [SocketSup,InPort, Opts], []).
+    gen_server:start_link(?MODULE, [SocketSup,InPort, Opts], []).
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -60,7 +60,7 @@ init([SocketSup, InPort, Opts]) ->
         {ok, ListenSocket} ->
             [{ok , _} = lwm2m_coap_dtls_socket_sup:start_socket(SocketSup, ListenSocket) || _ <- lists:seq(1,20)],
             {ok, #state{lsock = ListenSocket}};
-        {error, Reason} -> 
+        {error, Reason} ->
             {stop, {cannot_listen, InPort, Reason}}
     end.
 
