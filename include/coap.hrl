@@ -4,6 +4,8 @@
 -define(MAX_BLOCK_SIZE, 1024).
 -define(DEFAULT_MAX_AGE, 60).
 
+-define(UDP_SOCKOPTS, []).
+
 -record(coap_message, {type, method, id, token = <<>>, options = [], payload = <<>>}).
 -record(coap_content, {
     % supported options
@@ -31,6 +33,3 @@
 
 -type coap_message() :: #coap_message{}.
 -type coap_content() :: #coap_content{}.
-
--define(CLOSED, <<0>>).
--define(PING, <<1>>).

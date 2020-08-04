@@ -17,3 +17,5 @@ lwm2m_coap.iml
 rebar.lock
 *.d
 Makefile.orig.mk
+.rebar3
+*.swp
