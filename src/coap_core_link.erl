@@ -49,9 +49,40 @@ encode_link_uri(absolute, UriList) -> "</"++join_uri(UriList)++">";
 encode_link_uri(rootless, UriList) -> "<"++join_uri(UriList)++">".
 
 join_uri([Seg]) ->
-    http_uri:encode(binary_to_list(Seg));
+    http_uri_encode(binary_to_list(Seg));
 join_uri([Seg|Uri]) ->
-    http_uri:encode(binary_to_list(Seg))++"/"++join_uri(Uri).
+    http_uri_encode(binary_to_list(Seg))++"/"++join_uri(Uri).
+
+%% The following functions are forked from http_uri module
+%% reserved/1, http_uri_encode/1, uri_encode/1, uri_encode_binary/1
+
+reserved() ->
+    sets:from_list([$;, $:, $@, $&, $=, $+, $,, $/, $?,
+                    $#, $[, $], $<, $>, $\", ${, $}, $|, %"
+                    $\\, $', $^, $%, $ ]).
+
+http_uri_encode(URI) when is_list(URI) ->
+    Reserved = reserved(),
+    lists:append([uri_encode(Char, Reserved) || Char <- URI]);
+http_uri_encode(URI) when is_binary(URI) ->
+    Reserved = reserved(),
+    << <<(uri_encode_binary(Char, Reserved))/binary>> || <<Char>> <= URI >>.
+
+uri_encode(Char, Reserved) ->
+    case sets:is_element(Char, Reserved) of
+        true ->
+            [ $% | http_util:integer_to_hexlist(Char)];
+        false ->
+            [Char]
+    end.
+
+uri_encode_binary(Char, Reserved) ->
+    case sets:is_element(Char, Reserved) of
+        true ->
+            << $%, (integer_to_binary(Char, 16))/binary >>;
+        false ->
+            <<Char>>
+    end.
 
 encode_link_param({_Any, undefined}) -> undefined;
 encode_link_param({ct, Value}) -> ";ct=" ++ content_type_to_int(Value);
