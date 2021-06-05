@@ -49,9 +49,9 @@ encode_link_uri(absolute, UriList) -> "</"++join_uri(UriList)++">";
 encode_link_uri(rootless, UriList) -> "<"++join_uri(UriList)++">".
 
 join_uri([Seg]) ->
-    http_uri:encode(binary_to_list(Seg));
+    emqx_http_lib:uri_encode(binary_to_list(Seg));
 join_uri([Seg|Uri]) ->
-    http_uri:encode(binary_to_list(Seg))++"/"++join_uri(Uri).
+    emqx_http_lib:uri_encode(binary_to_list(Seg))++"/"++join_uri(Uri).
 
 encode_link_param({_Any, undefined}) -> undefined;
 encode_link_param({ct, Value}) -> ";ct=" ++ content_type_to_int(Value);

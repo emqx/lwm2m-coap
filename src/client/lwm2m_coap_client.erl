@@ -90,8 +90,10 @@ ack(Channel, Message) ->
 
 
 resolve_uri(Uri) ->
-    {ok, {Scheme, _UserInfo, Host, PortNo, Path, Query}} =
-        http_uri:parse(Uri, [{scheme_defaults, [{coap, ?DEFAULT_COAP_PORT}, {coaps, ?DEFAULT_COAPS_PORT}]}]),
+    {ok, Parsed} = emqx_http_lib:uri_parse(Uri),
+    #{scheme := Scheme, host := Host, path := Path, port := PortNo} = Parsed,
+    Scheme =/= coap andalso Scheme =/= coaps andalso error({unexpected_scheme, Scheme}), %% assert
+    Query = maps:get(query, Parsed, ""),
     {ok, PeerIP} = inet:getaddr(Host, inet),
     {Scheme, {PeerIP, PortNo}, split_path(Path), split_query(Query)}.
 
@@ -100,7 +102,8 @@ split_path([$/]) -> [];
 split_path([$/ | Path]) -> split_segments(Path, $/, []).
 
 split_query([]) -> [];
-split_query([$? | Path]) -> split_segments(Path, $&, []).
+split_query([$? | Path]) -> split_segments(Path, $&, []);
+split_query(Path) -> split_segments(Path, $&, []).
 
 split_segments(Path, Char, Acc) ->
     case string:rchr(Path, Char) of
@@ -112,7 +115,7 @@ split_segments(Path, Char, Acc) ->
     end.
 
 make_segment(Seg) ->
-    list_to_binary(http_uri:decode(Seg)).
+    list_to_binary(emqx_http_lib:uri_decode(Seg)).
 
 channel_apply(coap, ChId, Fun) ->
     {ok, Sock} = lwm2m_coap_udp_socket:start_link(),
