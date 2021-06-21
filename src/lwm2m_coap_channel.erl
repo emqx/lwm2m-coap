@@ -237,7 +237,8 @@ handle_datagram(BinMessage= <<?VERSION:2, _T:2, TKL:4, _Code:8, MsgId:16, Token:
     end;
 
 % silently ignore other versions
-handle_datagram(<<Ver:2, _/bytes>>, State) when Ver /= ?VERSION ->
+handle_datagram(Unexpected, State) ->
+    logger:debug("Unexpected datagram data: ~p", [Unexpected]),
     {noreply, State, hibernate}.
 
 %%--------------------------------------------------------------------
