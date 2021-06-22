@@ -1,31 +1,17 @@
 %% -*-: erlang -*-
-{"1.1.4",
+{"2.0.1",
    [
-     {"1.1.3", [
-       {load_module, lwm2m_coap_channel, brutal_purge, soft_purge, []}
-     ]},
-     {"1.1.2", [
-       {load_module, coap_core_link, brutal_purge, soft_purge, []},
-       {load_module, lwm2m_coap_client, brutal_purge, soft_purge, []},
+     {"2.0.0", [
+       {load_module, lwm2m_coap_server_content, brutal_purge, soft_purge, []},
        {load_module, lwm2m_coap_responder, brutal_purge, soft_purge, []},
        {load_module, lwm2m_coap_channel, brutal_purge, soft_purge, []}
-     ]},
-     {"0.3.0", [
-       {load_module, lwm2m_coap_transport, brutal_purge, soft_purge, []}
      ]}
    ],
    [
-     {"1.1.3", [
-       {load_module, lwm2m_coap_channel, brutal_purge, soft_purge, []}
-     ]},
-     {"1.1.2", [
-       {load_module, coap_core_link, brutal_purge, soft_purge, []},
-       {load_module, lwm2m_coap_client, brutal_purge, soft_purge, []},
+     {"2.0.0", [
+       {load_module, lwm2m_coap_server_content, brutal_purge, soft_purge, []},
        {load_module, lwm2m_coap_responder, brutal_purge, soft_purge, []},
        {load_module, lwm2m_coap_channel, brutal_purge, soft_purge, []}
-     ]},
-     {"0.3.0", [
-       {load_module, lwm2m_coap_transport, brutal_purge, soft_purge, []}
      ]}
    ]
 }.
