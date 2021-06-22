@@ -1,6 +1,10 @@
 %% -*-: erlang -*-
-{"1.1.4",
+{"1.1.5",
    [
+     {"1.1.4", [
+       {load_module, lwm2m_coap_responder, brutal_purge, soft_purge, []},
+       {load_module, lwm2m_coap_channel, brutal_purge, soft_purge, []}
+     ]},
      %% 1.1.3 was intentionally skipped
      {"1.1.2", [
        {load_module, lwm2m_coap_channel, brutal_purge, soft_purge, []}
@@ -16,6 +20,10 @@
      ]}
    ],
    [
+     {"1.1.4", [
+       {load_module, lwm2m_coap_responder, brutal_purge, soft_purge, []},
+       {load_module, lwm2m_coap_channel, brutal_purge, soft_purge, []}
+     ]},
      {"1.1.2", [
        {load_module, lwm2m_coap_channel, brutal_purge, soft_purge, []}
      ]},
