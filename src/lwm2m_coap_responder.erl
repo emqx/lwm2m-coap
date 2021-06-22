@@ -243,8 +243,6 @@ handle_method(_ChId, Request, _Resource, State) ->
 
 handle_observe(ChId, Request=#coap_message{options=Options}, Content=#coap_content{},
         State=#state{prefix=Prefix, module=Module, observer=undefined, lwm2m_state=Lwm2mState, args=Args}) ->
-    % the first observe request from this user to this resource
-    Content = lwm2m_coap_message:get_content(Request),
     case invoke_callback(Module, coap_observe, [ChId, Prefix, requires_ack(Request), Content], Lwm2mState, Args) of
         {ok, Lwm2mState2} ->
             Uri = proplists:get_value(uri_path, Options, []),
