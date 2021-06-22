@@ -65,7 +65,7 @@ init([Channel, Uri, Options]) ->
             {ok, #state{channel=Channel, prefix=Prefix, module=Module, args=Args,
                         insegs=orddict:new(), obseq=0}};
         undefined ->
-            {stop, {resource_handler_not_found, Uri}}
+            {stop, {shutdown, baduri}}
     end.
 
 handle_call(Msg, From, State) ->
