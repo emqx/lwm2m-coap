@@ -2,17 +2,20 @@
 {"1.1.5",
    [
      {"1.1.4", [
+       {load_module, lwm2m_coap_server_content, brutal_purge, soft_purge, []},
        {load_module, lwm2m_coap_responder, brutal_purge, soft_purge, []},
        {load_module, lwm2m_coap_channel, brutal_purge, soft_purge, []}
      ]},
      %% 1.1.3 was intentionally skipped
      {"1.1.2", [
+       {load_module, lwm2m_coap_server_content, brutal_purge, soft_purge, []},
        {load_module, lwm2m_coap_channel, brutal_purge, soft_purge, []}
      ]},
      %% The application version 0.3.0 is hard-coded by
      %% the .app.src file in the v1.1.1 repository version.
      {"0.3.0", [
        {load_module, lwm2m_coap_transport, brutal_purge, soft_purge, []},
+       {load_module, lwm2m_coap_server_content, brutal_purge, soft_purge, []},
        {load_module, lwm2m_coap_responder, brutal_purge, soft_purge, []},
        {load_module, lwm2m_coap_channel, brutal_purge, soft_purge, []},
        {load_module, lwm2m_coap_server, brutal_purge, soft_purge, []},
