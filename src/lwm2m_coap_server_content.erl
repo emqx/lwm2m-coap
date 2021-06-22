@@ -11,8 +11,17 @@
 -module(lwm2m_coap_server_content).
 -behaviour(lwm2m_coap_resource).
 
--export([coap_discover/2, coap_get/5, coap_post/5, coap_put/5, coap_delete/4,
-    coap_observe/5, coap_unobserve/1, handle_info/2, coap_ack/3]).
+-export([ coap_discover/2
+        , coap_get/5
+        , coap_post/5
+        , coap_put/5
+        , coap_delete/4
+        , coap_observe/5
+        , coap_unobserve/1
+        , handle_info/2
+        , coap_ack/3
+        , terminate/2
+        ]).
 
 -include("coap.hrl").
 
@@ -22,22 +31,36 @@
 coap_discover(_Prefix, _Args) ->
     [].
 
-coap_get(_ChId, _Prefix, [], Query, _State) ->
+coap_get(_ChId, _Prefix, Query, _Content, State) ->
     Links = coap_core_link:encode(filter(lwm2m_coap_server_registry:get_links(), Query)),
-    #coap_content{etag = binary:part(crypto:hash(sha, Links), {0,4}),
-                  content_format = <<"application/link-format">>,
-                  payload = list_to_binary(Links)};
-coap_get(_ChId, _Prefix, _Else, _Query, _State) ->
-    {error, not_found}.
+    {ok, #coap_content{etag = binary:part(crypto:hash(sha, Links), {0,4}),
+                       content_format = <<"application/link-format">>,
+                       payload = list_to_binary(Links)}, State};
 
-coap_post(_ChId, _Prefix, _Suffix, _Content, _State) -> {error, method_not_allowed}.
-coap_put(_ChId, _Prefix, _Suffix, _Content, _State) -> {error, method_not_allowed}.
-coap_delete(_ChId, _Prefix, _Suffix, _State) -> {error, method_not_allowed}.
+coap_get(_ChId, _Prefix, _Query, _Content, State) ->
+    {error, not_found, State}.
 
-coap_observe(_ChId, _Prefix, _Suffix, _Ack, _State) -> {error, method_not_allowed}.
-coap_unobserve(_State) -> ok.
-handle_info(_Message, State) -> {noreply, State}.
+coap_post(_ChId, _Prefix, _Query, _Content, State) ->
+    {error, method_not_allowed, State}.
+
+coap_put(_ChId, _Prefix, _Query, _Content, State) ->
+    {error, method_not_allowed, State}.
+
+coap_delete(_ChId, _Prefix, _Content, State) ->
+    {error, method_not_allowed, State}.
+
+coap_observe(_ChId, _Prefix, _Name, _Ack, State) ->
+    {error, method_not_allowed, State}.
+
+coap_unobserve(State) ->
+    {ok, State}.
+
 coap_ack(_ChId, _Ref, State) -> {ok, State}.
+
+handle_info(_Message, State) -> {noreply, State}.
+
+terminate(_Reason, _State) ->
+    ok.
 
 % uri-query processing
 
