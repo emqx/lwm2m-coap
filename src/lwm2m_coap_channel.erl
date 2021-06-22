@@ -168,10 +168,10 @@ handle_datagram(BinMessage= <<?VERSION:2, 0:1, _:1, _TKL:4, 0:3, _CodeDetail:5, 
                     State2 = State#state{responder = Re},
                     update_state(State2, TrId,
                         lwm2m_coap_transport:received(BinMessage, create_transport(TrId, undefined, State2)));
-                {error, {shutdown, Reason}} ->
-                    send_reset(Sock, ChId, MsgId,
-                        {Reason, Uri}),
+                {error, Reason} ->
+                    send_reset(Sock, ChId, MsgId, {Reason, Uri}),
                     {stop, {shutdown, coap_responder_start_failed}, State}
+
             end;
         {error, _Error} ->
             {noreply, State, hibernate}
